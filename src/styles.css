@@ -1,57 +1,63 @@
 body {
-  background: linear-gradient(135deg, #d4eaff, #eef7ff);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  color: #333;
-  margin: 0;
-  padding: 0;
-  min-height: 100vh;
+  background-color: #f8f9fa;
+  font-family: "Segoe UI", sans-serif;
 }
 
-.apple-style-bg {
-  background: white;
-  border-radius: 24px;
-  padding: 2rem;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+h2 {
+  font-weight: 700;
+  font-size: 1.8rem;
+  color: #212529;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-h1, h2 {
-  background: linear-gradient(90deg, #007bff, #00bfff);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  font-weight: 600;
-  letter-spacing: 0.5px;
+input,
+select,
+textarea {
+  background-color: #ffffff;
+  border-radius: 6px;
+  border: 1px solid #ced4da;
+  padding: 10px;
 }
 
-input, select, textarea, button {
-  font-size: 1rem;
-  border: none;
+input:focus,
+select:focus,
+textarea:focus {
   outline: none;
+  border-color: #0d6efd;
+  box-shadow: 0 0 5px rgba(13, 110, 253, 0.25);
 }
 
-input:focus, select:focus, textarea:focus {
-  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.3);
+.badge-success {
+  background-color: #28a745 !important;
 }
 
-.btn {
-  transition: all 0.2s ease-in-out;
-  border-radius: 12px;
+.badge-warning {
+  background-color: #ffc107 !important;
+  color: #000 !important;
 }
 
-.btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+.badge-danger {
+  background-color: #dc3545 !important;
 }
 
-.card {
-  background: #ffffffcc;
-  backdrop-filter: blur(8px);
-  border-radius: 24px;
-  border: none;
+body.dark-mode {
+  background-color: #121212;
+  color: #f0f0f0;
 }
-
-.stat-box {
-  font-size: 1.2rem;
-  font-weight: 600;
+body.dark-mode .apple-style-bg {
+  background-color: #1e1e1e;
+}
+body.dark-mode input,
+body.dark-mode textarea,
+body.dark-mode select {
+  background-color: #2c2c2c;
+  color: white;
+}
+body.dark-mode .card {
+  background: #1f1f1f;
+  border: 1px solid #333;
 }
 
 body.dark-mode {
@@ -118,4 +124,46 @@ body.dark-mode textarea {
   color: #fff;
   border: 1px solid #555;
 }
+body.dark-mode .btn {
+  color: #ffffff !important; /* Testo bianco */
+  background-color: #333333; /* Sfondo scuro */
+  border-color: #555555;
+}
 
+/* Modalità chiara */
+body:not(.dark-mode) .btn {
+  color: #000000; /* Testo nero */
+  background-color: #f8f9fa; /* Sfondo chiaro */
+  border-color: #ced4da;
+}
+/* 🌙 Dark mode – Testo leggibile ovunque */
+
+body.dark-mode {
+  color: #ffffff;
+}
+
+body.dark-mode input::placeholder,
+body.dark-mode textarea::placeholder,
+body.dark-mode select {
+  color: #cccccc;
+}
+
+body.dark-mode .form-control,
+body.dark-mode .form-select,
+body.dark-mode textarea {
+  background-color: #2a2a2a;
+  color: #ffffff;
+  border-color: #555;
+}
+
+body.dark-mode label,
+body.dark-mode .card-body,
+body.dark-mode .modal-content,
+body.dark-mode .badge {
+  color: #ffffff !important;
+}
+
+/* Pulsanti (già presente ma lo ribadiamo) */
+body.dark-mode .btn {
+  color: #ffffff !important;
+}
