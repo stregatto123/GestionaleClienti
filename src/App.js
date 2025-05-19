@@ -19,7 +19,7 @@ export default function App() {
     dataScadenza: "",
     note: "",
     tags: "",
-    file: null
+    file: null,
   });
 
   const [filtro, setFiltro] = useState("");
@@ -73,7 +73,7 @@ export default function App() {
       dataScadenza: "",
       note: "",
       tags: "",
-      file: null
+      file: null,
     });
   };
 
@@ -98,13 +98,17 @@ export default function App() {
   };
 
   const clientiFiltrati = clienti
-    .filter((c) => `${c.nome} ${c.cognome}`.toLowerCase().includes(filtro.toLowerCase()))
+    .filter((c) =>
+      `${c.nome} ${c.cognome}`.toLowerCase().includes(filtro.toLowerCase())
+    )
     .filter((c) => (tipoFiltro ? c.polizza === tipoFiltro : true));
 
   if (!autenticato) {
     return (
       <div className="container py-5 apple-style-bg">
-        <h2 className="text-center mb-4 text-dark">Accesso al Gestionale</h2>
+        <h2 className="text-center mb-4 gradient-title">
+          Accesso al Gestionale
+        </h2>
         <input
           type="password"
           className="form-control mb-3 rounded-5 shadow text-center"
@@ -123,32 +127,43 @@ export default function App() {
   }
 
   const totale = clienti.length;
-  const totRca = clienti.filter(c => c.polizza === "rca").length;
-  const totVita = clienti.filter(c => c.polizza === "vita").length;
-  const totDanni = clienti.filter(c => c.polizza === "danni").length;
+  const totRca = clienti.filter((c) => c.polizza === "rca").length;
+  const totVita = clienti.filter((c) => c.polizza === "vita").length;
+  const totDanni = clienti.filter((c) => c.polizza === "danni").length;
 
   return (
     <div className="container py-5 apple-style-bg">
-      <h1 className="text-center text-dark display-5 mb-4">Gestionale Clienti</h1>
+      <h1 className="text-center gradient-title display-5 mb-4">
+        Gestionale Clienti
+      </h1>
 
       {avvisi.length > 0 && (
         <div className="alert alert-warning rounded-4 shadow-sm">
-          <strong>Attenzione:</strong> Hai {avvisi.length} polizza/e in scadenza nei prossimi 15 giorni.
+          <strong>Attenzione:</strong> Hai {avvisi.length} polizza/e in scadenza
+          nei prossimi 15 giorni.
         </div>
       )}
 
       <div className="row mb-4 text-center">
         <div className="col">
-          <div className="stat-box bg-light rounded-4 shadow-sm p-3">Totale: {totale}</div>
+          <div className="stat-box bg-primary text-white rounded-4 shadow-sm p-3">
+            Totale: {totale}
+          </div>
         </div>
         <div className="col">
-          <div className="stat-box bg-light rounded-4 shadow-sm p-3">RCA: {totRca}</div>
+          <div className="stat-box bg-info text-white rounded-4 shadow-sm p-3">
+            RCA: {totRca}
+          </div>
         </div>
         <div className="col">
-          <div className="stat-box bg-light rounded-4 shadow-sm p-3">Vita: {totVita}</div>
+          <div className="stat-box bg-success text-white rounded-4 shadow-sm p-3">
+            Vita: {totVita}
+          </div>
         </div>
         <div className="col">
-          <div className="stat-box bg-light rounded-4 shadow-sm p-3">Danni: {totDanni}</div>
+          <div className="stat-box bg-secondary text-white rounded-4 shadow-sm p-3">
+            Danni: {totDanni}
+          </div>
         </div>
       </div>
 
@@ -223,7 +238,10 @@ export default function App() {
           />
         </div>
         <div className="col-12">
-          <button className="btn btn-primary w-100 rounded-5 shadow" onClick={aggiungiCliente}>
+          <button
+            className="btn btn-primary w-100 rounded-5 shadow"
+            onClick={aggiungiCliente}
+          >
             {modificaIndex !== null ? "Salva Modifiche" : "Aggiungi Cliente"}
           </button>
         </div>
@@ -234,12 +252,18 @@ export default function App() {
       <div className="row">
         {clientiFiltrati.map((c, index) => (
           <div className="col-md-6 mb-3" key={index}>
-            <div className={`card shadow border-${getColoreStato(c.dataScadenza)} rounded-5`}>
+            <div
+              className={`card shadow border-${getColoreStato(
+                c.dataScadenza
+              )} rounded-5`}
+            >
               <div className="card-body">
                 <h5 className="card-title fw-semibold">
                   {c.nome} {c.cognome}
                 </h5>
-                <span className={`badge bg-${getColoreStato(c.dataScadenza)} mb-2`}>
+                <span
+                  className={`badge bg-${getColoreStato(c.dataScadenza)} mb-2`}
+                >
                   {getColoreStato(c.dataScadenza) === "success"
                     ? "Attiva"
                     : getColoreStato(c.dataScadenza) === "warning"
@@ -247,13 +271,32 @@ export default function App() {
                     : "Scaduta"}
                 </span>
                 <ul className="list-unstyled small text-muted">
-                  <li><strong>Polizza:</strong> {c.polizza.toUpperCase()} – #{c.numeroPolizza}</li>
-                  <li><strong>Telefono:</strong> {c.telefono}</li>
-                  <li><strong>Firma:</strong> {c.dataFirma}</li>
-                  <li><strong>Scadenza:</strong> {c.dataScadenza}</li>
-                  <li><strong>Note:</strong> {c.note}</li>
-                  {c.tags && <li><strong>Tag:</strong> {c.tags}</li>}
-                  {c.fileName && <li><strong>File:</strong> {c.fileName}</li>}
+                  <li>
+                    <strong>Polizza:</strong> {c.polizza.toUpperCase()} – #
+                    {c.numeroPolizza}
+                  </li>
+                  <li>
+                    <strong>Telefono:</strong> {c.telefono}
+                  </li>
+                  <li>
+                    <strong>Firma:</strong> {c.dataFirma}
+                  </li>
+                  <li>
+                    <strong>Scadenza:</strong> {c.dataScadenza}
+                  </li>
+                  <li>
+                    <strong>Note:</strong> {c.note}
+                  </li>
+                  {c.tags && (
+                    <li>
+                      <strong>Tag:</strong> {c.tags}
+                    </li>
+                  )}
+                  {c.fileName && (
+                    <li>
+                      <strong>File:</strong> {c.fileName}
+                    </li>
+                  )}
                 </ul>
                 <div className="d-flex gap-2">
                   <button
@@ -277,4 +320,3 @@ export default function App() {
     </div>
   );
 }
-
