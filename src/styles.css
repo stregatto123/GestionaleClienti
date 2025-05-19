@@ -53,3 +53,39 @@ input:focus, select:focus, textarea:focus {
   font-size: 1.2rem;
   font-weight: 600;
 }
+
+body.dark-mode {
+  background-color: #121212;
+  color: #f0f0f0;
+}
+
+body.dark-mode .apple-style-bg {
+  background-color: #1e1e1e;
+}
+
+body.dark-mode .form-control,
+body.dark-mode .form-select,
+body.dark-mode textarea {
+  background-color: #2b2b2b;
+  color: white;
+  border: 1px solid #444;
+}
+
+body.dark-mode .btn {
+  border-color: #777;
+}
+
+body.dark-mode .modal-content {
+  background-color: #1f1f1f;
+  color: white;
+  border: 1px solid #333;
+}
+
+body.dark-mode .modal-header,
+body.dark-mode .modal-footer {
+  border-color: #444;
+}
+
+body.dark-mode .btn-close {
+  filter: invert(1);
+}
