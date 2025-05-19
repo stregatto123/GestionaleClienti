@@ -89,3 +89,33 @@ body.dark-mode .modal-footer {
 body.dark-mode .btn-close {
   filter: invert(1);
 }
+
+body.dark-mode .modal-backdrop {
+  background-color: rgba(0, 0, 0, 0.85);
+}
+
+body.dark-mode .modal-content {
+  background-color: #222 !important;
+  color: #f1f1f1;
+  border-radius: 1rem;
+  border: 1px solid #444;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.5);
+}
+
+body.dark-mode .modal-header,
+body.dark-mode .modal-footer {
+  border-color: #333;
+}
+
+body.dark-mode .btn-close {
+  filter: invert(1);
+}
+
+body.dark-mode input,
+body.dark-mode select,
+body.dark-mode textarea {
+  background-color: #2a2a2a;
+  color: #fff;
+  border: 1px solid #555;
+}
+
