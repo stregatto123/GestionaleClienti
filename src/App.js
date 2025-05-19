@@ -26,6 +26,7 @@ export default function App() {
   const [tipoFiltro, setTipoFiltro] = useState("");
   const [modificaIndex, setModificaIndex] = useState(null);
   const [avvisi, setAvvisi] = useState([]);
+  const [mostraForm, setMostraForm] = useState(false); // per modale
 
   useEffect(() => {
     localStorage.setItem("clienti", JSON.stringify(clienti));
@@ -39,6 +40,13 @@ export default function App() {
     });
     setAvvisi(notifiche);
   }, [clienti]);
+
+  useEffect(() => {
+    const prefersDark = window.matchMedia(
+      "(prefers-color-scheme: dark)"
+    ).matches;
+    document.body.classList.toggle("dark-mode", prefersDark);
+  }, []);
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
@@ -75,6 +83,18 @@ export default function App() {
       tags: "",
       file: null,
     });
+    setMostraForm(false);
+  };
+
+  const esportaClienti = () => {
+    const data = JSON.stringify(clienti, null, 2);
+    const blob = new Blob([data], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "clienti.json";
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   const eliminaCliente = (index) => {
@@ -85,6 +105,7 @@ export default function App() {
   const modificaCliente = (index) => {
     setForm(clienti[index]);
     setModificaIndex(index);
+    setMostraForm(true);
   };
 
   const getColoreStato = (dataScadenza) => {
@@ -102,22 +123,6 @@ export default function App() {
       `${c.nome} ${c.cognome}`.toLowerCase().includes(filtro.toLowerCase())
     )
     .filter((c) => (tipoFiltro ? c.polizza === tipoFiltro : true));
-
-  const totale = clienti.length;
-  const totRca = clienti.filter((c) => c.polizza === "rca").length;
-  const totVita = clienti.filter((c) => c.polizza === "vita").length;
-  const totDanni = clienti.filter((c) => c.polizza === "danni").length;
-
-  const esportaClienti = () => {
-    const data = JSON.stringify(clienti, null, 2);
-    const blob = new Blob([data], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "clienti.json";
-    a.click();
-    URL.revokeObjectURL(url);
-  };
 
   if (!autenticato) {
     return (
@@ -142,8 +147,24 @@ export default function App() {
     );
   }
 
+  const totale = clienti.length;
+  const totRca = clienti.filter((c) => c.polizza === "rca").length;
+  const totVita = clienti.filter((c) => c.polizza === "vita").length;
+  const totDanni = clienti.filter((c) => c.polizza === "danni").length;
+
   return (
     <div className="container py-5 apple-style-bg">
+      <div className="text-end mb-2">
+        <button
+          className="btn btn-sm btn-outline-secondary rounded-5"
+          onClick={() => {
+            document.body.classList.toggle("dark-mode");
+          }}
+        >
+          🌓 Cambia tema
+        </button>
+      </div>
+
       <h1 className="text-center gradient-title display-5 mb-4">
         Gestionale Clienti
       </h1>
@@ -178,165 +199,177 @@ export default function App() {
         </div>
       </div>
 
-      <div className="text-center mb-4">
+      <div className="d-flex justify-content-center gap-3 mb-4 flex-wrap">
         <button
           className="btn btn-outline-dark rounded-5 shadow-sm px-4"
           onClick={esportaClienti}
         >
           📤 Esporta clienti (.json)
         </button>
-      </div>
 
-      <div className="row g-3 mb-4">
-        {["nome", "cognome", "numeroPolizza", "telefono"].map((field, i) => (
-          <div className="col-md-6" key={i}>
-            <input
-              className="form-control rounded-5 shadow"
-              name={field}
-              placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
-              value={form[field]}
-              onChange={handleChange}
-            />
-          </div>
-        ))}
-        <div className="col-md-6">
-          <select
-            className="form-select rounded-5 shadow"
-            name="polizza"
-            value={form.polizza}
-            onChange={handleChange}
-          >
-            <option value="">Tipo di polizza</option>
-            <option value="rca">RCA</option>
-            <option value="vita">Vita</option>
-            <option value="danni">Danni</option>
-          </select>
-        </div>
-        <div className="col-md-3">
+        <label className="btn btn-outline-primary rounded-5 shadow-sm px-4">
+          📥 Importa clienti (.json)
           <input
-            className="form-control rounded-5 shadow"
-            type="date"
-            name="dataFirma"
-            value={form.dataFirma}
-            onChange={handleChange}
-          />
-        </div>
-        <div className="col-md-3">
-          <input
-            className="form-control rounded-5 shadow"
-            type="date"
-            name="dataScadenza"
-            value={form.dataScadenza}
-            onChange={handleChange}
-          />
-        </div>
-        <div className="col-12">
-          <textarea
-            className="form-control rounded-5 shadow"
-            name="note"
-            placeholder="Note aggiuntive"
-            value={form.note}
-            onChange={handleChange}
-          ></textarea>
-        </div>
-        <div className="col-12">
-          <input
-            className="form-control rounded-5 shadow"
-            type="text"
-            name="tags"
-            placeholder="Tag (es. cliente top, da richiamare...)"
-            value={form.tags}
-            onChange={handleChange}
-          />
-        </div>
-        <div className="col-12">
-          <input
-            className="form-control rounded-5 shadow"
             type="file"
-            name="file"
-            onChange={handleChange}
+            accept=".json"
+            hidden
+            onChange={(e) => {
+              const file = e.target.files[0];
+              if (!file) return;
+              const reader = new FileReader();
+              reader.onload = (event) => {
+                try {
+                  const datiImportati = JSON.parse(event.target.result);
+                  if (Array.isArray(datiImportati)) {
+                    setClienti(datiImportati);
+                    alert("Clienti importati correttamente!");
+                  } else {
+                    alert("Il file non contiene un array valido.");
+                  }
+                } catch (err) {
+                  alert("Errore durante l'importazione: file non valido.");
+                }
+              };
+              reader.readAsText(file);
+            }}
           />
-        </div>
-        <div className="col-12">
-          <button
-            className="btn btn-primary w-100 rounded-5 shadow"
-            onClick={aggiungiCliente}
-          >
-            {modificaIndex !== null ? "Salva Modifiche" : "Aggiungi Cliente"}
-          </button>
-        </div>
+        </label>
       </div>
 
-      <hr />
+      <div className="text-center mb-4">
+        <button
+          className="btn btn-success rounded-5 shadow"
+          onClick={() => {
+            setForm({
+              nome: "",
+              cognome: "",
+              polizza: "",
+              telefono: "",
+              numeroPolizza: "",
+              dataFirma: "",
+              dataScadenza: "",
+              note: "",
+              tags: "",
+              file: null,
+            });
+            setModificaIndex(null);
+            setMostraForm(true);
+          }}
+        >
+          ➕ Aggiungi cliente
+        </button>
+      </div>
 
-      <div className="row">
-        {clientiFiltrati.map((c, index) => (
-          <div className="col-md-6 mb-3" key={index}>
-            <div
-              className={`card shadow border-${getColoreStato(
-                c.dataScadenza
-              )} rounded-5`}
-            >
-              <div className="card-body">
-                <h5 className="card-title fw-semibold">
-                  {c.nome} {c.cognome}
-                </h5>
-                <span
-                  className={`badge bg-${getColoreStato(c.dataScadenza)} mb-2`}
-                >
-                  {getColoreStato(c.dataScadenza) === "success"
-                    ? "Attiva"
-                    : getColoreStato(c.dataScadenza) === "warning"
-                    ? "In scadenza"
-                    : "Scaduta"}
-                </span>
-                <ul className="list-unstyled small text-muted">
-                  <li>
-                    <strong>Polizza:</strong> {c.polizza.toUpperCase()} – #
-                    {c.numeroPolizza}
-                  </li>
-                  <li>
-                    <strong>Telefono:</strong> {c.telefono}
-                  </li>
-                  <li>
-                    <strong>Firma:</strong> {c.dataFirma}
-                  </li>
-                  <li>
-                    <strong>Scadenza:</strong> {c.dataScadenza}
-                  </li>
-                  <li>
-                    <strong>Note:</strong> {c.note}
-                  </li>
-                  {c.tags && (
-                    <li>
-                      <strong>Tag:</strong> {c.tags}
-                    </li>
-                  )}
-                  {c.fileName && (
-                    <li>
-                      <strong>File:</strong> {c.fileName}
-                    </li>
-                  )}
-                </ul>
-                <div className="d-flex gap-2">
+      {mostraForm && (
+        <div className="modal-backdrop show">
+          <div className="modal d-block" tabIndex="-1">
+            <div className="modal-dialog modal-lg">
+              <div className="modal-content rounded-4">
+                <div className="modal-header">
+                  <h5 className="modal-title">
+                    {modificaIndex !== null
+                      ? "Modifica Cliente"
+                      : "Aggiungi Cliente"}
+                  </h5>
                   <button
-                    className="btn btn-outline-primary btn-sm rounded-5 shadow"
-                    onClick={() => modificaCliente(index)}
+                    type="button"
+                    className="btn-close"
+                    onClick={() => setMostraForm(false)}
+                  ></button>
+                </div>
+                <div className="modal-body">
+                  <div className="row g-3">
+                    {["nome", "cognome", "numeroPolizza", "telefono"].map(
+                      (field, i) => (
+                        <div className="col-md-6" key={i}>
+                          <input
+                            className="form-control rounded-5"
+                            name={field}
+                            placeholder={
+                              field.charAt(0).toUpperCase() + field.slice(1)
+                            }
+                            value={form[field]}
+                            onChange={handleChange}
+                          />
+                        </div>
+                      )
+                    )}
+                    <div className="col-md-6">
+                      <select
+                        className="form-select rounded-5"
+                        name="polizza"
+                        value={form.polizza}
+                        onChange={handleChange}
+                      >
+                        <option value="">Tipo di polizza</option>
+                        <option value="rca">RCA</option>
+                        <option value="vita">Vita</option>
+                        <option value="danni">Danni</option>
+                      </select>
+                    </div>
+                    <div className="col-md-3">
+                      <input
+                        className="form-control rounded-5"
+                        type="date"
+                        name="dataFirma"
+                        value={form.dataFirma}
+                        onChange={handleChange}
+                      />
+                    </div>
+                    <div className="col-md-3">
+                      <input
+                        className="form-control rounded-5"
+                        type="date"
+                        name="dataScadenza"
+                        value={form.dataScadenza}
+                        onChange={handleChange}
+                      />
+                    </div>
+                    <div className="col-12">
+                      <textarea
+                        className="form-control rounded-5"
+                        name="note"
+                        placeholder="Note aggiuntive"
+                        value={form.note}
+                        onChange={handleChange}
+                      ></textarea>
+                    </div>
+                    <div className="col-12">
+                      <input
+                        className="form-control rounded-5"
+                        type="text"
+                        name="tags"
+                        placeholder="Tag (es. cliente top, da richiamare...)"
+                        value={form.tags}
+                        onChange={handleChange}
+                      />
+                    </div>
+                    <div className="col-12">
+                      <input
+                        className="form-control rounded-5"
+                        type="file"
+                        name="file"
+                        onChange={handleChange}
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div className="modal-footer">
+                  <button
+                    className="btn btn-secondary"
+                    onClick={() => setMostraForm(false)}
                   >
-                    Modifica
+                    Chiudi
                   </button>
-                  <button
-                    className="btn btn-outline-danger btn-sm rounded-5 shadow"
-                    onClick={() => eliminaCliente(index)}
-                  >
-                    Elimina
+                  <button className="btn btn-primary" onClick={aggiungiCliente}>
+                    {modificaIndex !== null ? "Salva Modifiche" : "Aggiungi"}
                   </button>
                 </div>
               </div>
             </div>
           </div>
-        ))}
-      </div>
+        </div>
+      )}
     </div>
   );
 }
