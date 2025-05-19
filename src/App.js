@@ -103,6 +103,22 @@ export default function App() {
     )
     .filter((c) => (tipoFiltro ? c.polizza === tipoFiltro : true));
 
+  const totale = clienti.length;
+  const totRca = clienti.filter((c) => c.polizza === "rca").length;
+  const totVita = clienti.filter((c) => c.polizza === "vita").length;
+  const totDanni = clienti.filter((c) => c.polizza === "danni").length;
+
+  const esportaClienti = () => {
+    const data = JSON.stringify(clienti, null, 2);
+    const blob = new Blob([data], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "clienti.json";
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   if (!autenticato) {
     return (
       <div className="container py-5 apple-style-bg">
@@ -125,11 +141,6 @@ export default function App() {
       </div>
     );
   }
-
-  const totale = clienti.length;
-  const totRca = clienti.filter((c) => c.polizza === "rca").length;
-  const totVita = clienti.filter((c) => c.polizza === "vita").length;
-  const totDanni = clienti.filter((c) => c.polizza === "danni").length;
 
   return (
     <div className="container py-5 apple-style-bg">
@@ -165,6 +176,15 @@ export default function App() {
             Danni: {totDanni}
           </div>
         </div>
+      </div>
+
+      <div className="text-center mb-4">
+        <button
+          className="btn btn-outline-dark rounded-5 shadow-sm px-4"
+          onClick={esportaClienti}
+        >
+          📤 Esporta clienti (.json)
+        </button>
       </div>
 
       <div className="row g-3 mb-4">
