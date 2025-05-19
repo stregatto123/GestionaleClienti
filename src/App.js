@@ -8,7 +8,6 @@ export default function App() {
   });
   const [password, setPassword] = useState("");
   const [autenticato, setAutenticato] = useState(false);
-
   const [form, setForm] = useState({
     nome: "",
     cognome: "",
@@ -21,12 +20,11 @@ export default function App() {
     tags: "",
     file: null,
   });
-
   const [filtro, setFiltro] = useState("");
   const [tipoFiltro, setTipoFiltro] = useState("");
   const [modificaIndex, setModificaIndex] = useState(null);
   const [avvisi, setAvvisi] = useState([]);
-  const [mostraForm, setMostraForm] = useState(false); // per modale
+  const [mostraForm, setMostraForm] = useState(false);
 
   useEffect(() => {
     localStorage.setItem("clienti", JSON.stringify(clienti));
@@ -124,6 +122,11 @@ export default function App() {
     )
     .filter((c) => (tipoFiltro ? c.polizza === tipoFiltro : true));
 
+  const totale = clienti.length;
+  const totRca = clienti.filter((c) => c.polizza === "rca").length;
+  const totVita = clienti.filter((c) => c.polizza === "vita").length;
+  const totDanni = clienti.filter((c) => c.polizza === "danni").length;
+
   if (!autenticato) {
     return (
       <div className="container py-5 apple-style-bg">
@@ -147,19 +150,12 @@ export default function App() {
     );
   }
 
-  const totale = clienti.length;
-  const totRca = clienti.filter((c) => c.polizza === "rca").length;
-  const totVita = clienti.filter((c) => c.polizza === "vita").length;
-  const totDanni = clienti.filter((c) => c.polizza === "danni").length;
-
   return (
     <div className="container py-5 apple-style-bg">
       <div className="text-end mb-2">
         <button
           className="btn btn-sm btn-outline-secondary rounded-5"
-          onClick={() => {
-            document.body.classList.toggle("dark-mode");
-          }}
+          onClick={() => document.body.classList.toggle("dark-mode")}
         >
           🌓 Cambia tema
         </button>
@@ -206,7 +202,6 @@ export default function App() {
         >
           📤 Esporta clienti (.json)
         </button>
-
         <label className="btn btn-outline-primary rounded-5 shadow-sm px-4">
           📥 Importa clienti (.json)
           <input
@@ -234,9 +229,6 @@ export default function App() {
             }}
           />
         </label>
-      </div>
-
-      <div className="text-center mb-4">
         <button
           className="btn btn-success rounded-5 shadow"
           onClick={() => {
@@ -260,116 +252,206 @@ export default function App() {
         </button>
       </div>
 
+      {/* Modal form semplificata, no trasparenze */}
       {mostraForm && (
-        <div className="modal-backdrop show">
-          <div className="modal d-block" tabIndex="-1">
-            <div className="modal-dialog modal-lg">
-              <div className="modal-content rounded-4">
-                <div className="modal-header">
-                  <h5 className="modal-title">
-                    {modificaIndex !== null
-                      ? "Modifica Cliente"
-                      : "Aggiungi Cliente"}
-                  </h5>
-                  <button
-                    type="button"
-                    className="btn-close"
-                    onClick={() => setMostraForm(false)}
-                  ></button>
-                </div>
-                <div className="modal-body">
-                  <div className="row g-3">
-                    {["nome", "cognome", "numeroPolizza", "telefono"].map(
-                      (field, i) => (
-                        <div className="col-md-6" key={i}>
-                          <input
-                            className="form-control rounded-5"
-                            name={field}
-                            placeholder={
-                              field.charAt(0).toUpperCase() + field.slice(1)
-                            }
-                            value={form[field]}
-                            onChange={handleChange}
-                          />
-                        </div>
-                      )
-                    )}
-                    <div className="col-md-6">
-                      <select
-                        className="form-select rounded-5"
-                        name="polizza"
-                        value={form.polizza}
-                        onChange={handleChange}
-                      >
-                        <option value="">Tipo di polizza</option>
-                        <option value="rca">RCA</option>
-                        <option value="vita">Vita</option>
-                        <option value="danni">Danni</option>
-                      </select>
-                    </div>
-                    <div className="col-md-3">
-                      <input
-                        className="form-control rounded-5"
-                        type="date"
-                        name="dataFirma"
-                        value={form.dataFirma}
-                        onChange={handleChange}
-                      />
-                    </div>
-                    <div className="col-md-3">
-                      <input
-                        className="form-control rounded-5"
-                        type="date"
-                        name="dataScadenza"
-                        value={form.dataScadenza}
-                        onChange={handleChange}
-                      />
-                    </div>
-                    <div className="col-12">
-                      <textarea
-                        className="form-control rounded-5"
-                        name="note"
-                        placeholder="Note aggiuntive"
-                        value={form.note}
-                        onChange={handleChange}
-                      ></textarea>
-                    </div>
-                    <div className="col-12">
-                      <input
-                        className="form-control rounded-5"
-                        type="text"
-                        name="tags"
-                        placeholder="Tag (es. cliente top, da richiamare...)"
-                        value={form.tags}
-                        onChange={handleChange}
-                      />
-                    </div>
-                    <div className="col-12">
-                      <input
-                        className="form-control rounded-5"
-                        type="file"
-                        name="file"
-                        onChange={handleChange}
-                      />
-                    </div>
+        <div className="modal show d-block" tabIndex="-1">
+          <div className="modal-dialog modal-lg">
+            <div className="modal-content rounded-4 shadow-lg border border-light bg-light text-white">
+              <div className="modal-header">
+                <h5 className="modal-title">
+                  {modificaIndex !== null
+                    ? "Modifica Cliente"
+                    : "Aggiungi Cliente"}
+                </h5>
+                <button
+                  type="button"
+                  className="btn-close"
+                  onClick={() => setMostraForm(false)}
+                ></button>
+              </div>
+              <div className="modal-body">
+                <div className="row g-3">
+                  {["nome", "cognome", "numeroPolizza", "telefono"].map(
+                    (field, i) => (
+                      <div className="col-md-6" key={i}>
+                        <input
+                          className="form-control"
+                          name={field}
+                          placeholder={field}
+                          value={form[field]}
+                          onChange={handleChange}
+                        />
+                      </div>
+                    )
+                  )}
+                  <div className="col-md-6">
+                    <select
+                      className="form-select"
+                      name="polizza"
+                      value={form.polizza}
+                      onChange={handleChange}
+                    >
+                      <option value="">Tipo di polizza</option>
+                      <option value="rca">RCA</option>
+                      <option value="vita">Vita</option>
+                      <option value="danni">Danni</option>
+                    </select>
+                  </div>
+                  <div className="col-md-3">
+                    <input
+                      className="form-control"
+                      type="date"
+                      name="dataFirma"
+                      value={form.dataFirma}
+                      onChange={handleChange}
+                    />
+                  </div>
+                  <div className="col-md-3">
+                    <input
+                      className="form-control"
+                      type="date"
+                      name="dataScadenza"
+                      value={form.dataScadenza}
+                      onChange={handleChange}
+                    />
+                  </div>
+                  <div className="col-12">
+                    <textarea
+                      className="form-control"
+                      name="note"
+                      placeholder="Note"
+                      value={form.note}
+                      onChange={handleChange}
+                    ></textarea>
+                  </div>
+                  <div className="col-12">
+                    <input
+                      className="form-control"
+                      type="text"
+                      name="tags"
+                      placeholder="Tag"
+                      value={form.tags}
+                      onChange={handleChange}
+                    />
+                  </div>
+                  <div className="col-12">
+                    <input
+                      className="form-control"
+                      type="file"
+                      name="file"
+                      onChange={handleChange}
+                    />
                   </div>
                 </div>
-                <div className="modal-footer">
-                  <button
-                    className="btn btn-secondary"
-                    onClick={() => setMostraForm(false)}
-                  >
-                    Chiudi
-                  </button>
-                  <button className="btn btn-primary" onClick={aggiungiCliente}>
-                    {modificaIndex !== null ? "Salva Modifiche" : "Aggiungi"}
-                  </button>
-                </div>
+              </div>
+              <div className="modal-footer">
+                <button
+                  className="btn btn-secondary"
+                  onClick={() => setMostraForm(false)}
+                >
+                  Chiudi
+                </button>
+                <button className="btn btn-primary" onClick={aggiungiCliente}>
+                  {modificaIndex !== null ? "Salva" : "Aggiungi"}
+                </button>
               </div>
             </div>
           </div>
         </div>
       )}
+
+      <div className="row g-3 mb-4 align-items-end">
+        <div className="col-md-8">
+          <input
+            type="text"
+            className="form-control rounded-5 shadow"
+            placeholder="Cerca cliente per nome o cognome..."
+            value={filtro}
+            onChange={(e) => setFiltro(e.target.value)}
+          />
+        </div>
+        <div className="col-md-4">
+          <select
+            className="form-select rounded-5 shadow"
+            value={tipoFiltro}
+            onChange={(e) => setTipoFiltro(e.target.value)}
+          >
+            <option value="">Tutti i tipi di polizza</option>
+            <option value="rca">RCA</option>
+            <option value="vita">Vita</option>
+            <option value="danni">Danni</option>
+          </select>
+        </div>
+      </div>
+
+      <div className="row">
+        {clientiFiltrati.map((c, index) => (
+          <div className="col-md-6 mb-3" key={index}>
+            <div
+              className={`card shadow border-${getColoreStato(
+                c.dataScadenza
+              )} rounded-5`}
+            >
+              <div className="card-body">
+                <h5 className="card-title fw-semibold">
+                  {c.nome} {c.cognome}
+                </h5>
+                <span
+                  className={`badge bg-${getColoreStato(c.dataScadenza)} mb-2`}
+                >
+                  {getColoreStato(c.dataScadenza) === "success"
+                    ? "Attiva"
+                    : getColoreStato(c.dataScadenza) === "warning"
+                    ? "In scadenza"
+                    : "Scaduta"}
+                </span>
+                <ul className="list-unstyled small text-muted">
+                  <li>
+                    <strong>Polizza:</strong> {c.polizza.toUpperCase()} – #
+                    {c.numeroPolizza}
+                  </li>
+                  <li>
+                    <strong>Telefono:</strong> {c.telefono}
+                  </li>
+                  <li>
+                    <strong>Firma:</strong> {c.dataFirma}
+                  </li>
+                  <li>
+                    <strong>Scadenza:</strong> {c.dataScadenza}
+                  </li>
+                  <li>
+                    <strong>Note:</strong> {c.note}
+                  </li>
+                  {c.tags && (
+                    <li>
+                      <strong>Tag:</strong> {c.tags}
+                    </li>
+                  )}
+                  {c.fileName && (
+                    <li>
+                      <strong>File:</strong> {c.fileName}
+                    </li>
+                  )}
+                </ul>
+                <div className="d-flex gap-2">
+                  <button
+                    className="btn btn-outline-primary btn-sm rounded-5 shadow"
+                    onClick={() => modificaCliente(index)}
+                  >
+                    Modifica
+                  </button>
+                  <button
+                    className="btn btn-outline-danger btn-sm rounded-5 shadow"
+                    onClick={() => eliminaCliente(index)}
+                  >
+                    Elimina
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
